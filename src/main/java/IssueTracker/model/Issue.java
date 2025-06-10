@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.lang.reflect.Type;
 
 @Entity
-
 public class Issue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

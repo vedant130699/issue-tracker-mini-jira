@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.JobKOctets;
@@ -28,6 +29,7 @@ public class IssueController {
     }
 
     //get all issues
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping()
     public List<Issue> getAllIssues(){
         return issueService.findAll();
@@ -44,6 +46,7 @@ public class IssueController {
     }
 
     @PostMapping("/issue")
+    @PreAuthorize("hasRole('ADMIN')")
     public Issue addIssue(@RequestBody Issue theIssue){
         //incase they pss some id in json, set that id to 0
         //this is to force save of the new item instead of an update
@@ -52,6 +55,7 @@ public class IssueController {
         return dbIssue;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/issue")
     public Issue updateIssue(@RequestBody Issue issue){
         Issue dbIssue = issueService.save(issue);
@@ -59,6 +63,7 @@ public class IssueController {
     }
 
     //patch mapping... used for partial update
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/issue/{id}")
     public Issue patchIssue(@PathVariable long id, @RequestBody Map<String, Object>patchPayLoad ){
         Issue tempIssue = issueService.findById(id);
@@ -67,7 +72,7 @@ public class IssueController {
         }
         //throw exception if request body contains "id" key
         if(patchPayLoad.containsKey("id")){
-            throw new RuntimeException("Issue Id not allowd in request body");
+            throw new RuntimeException("Issue id is not allowed in request body");
         }
 
         Issue patchedIssue = apply(patchPayLoad, tempIssue);
@@ -91,6 +96,7 @@ public class IssueController {
     }
 
     @DeleteMapping("/issue/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deleteIssue(@PathVariable long id){
         Issue tempIssue = issueService.findById(id);
         if(tempIssue == null){
