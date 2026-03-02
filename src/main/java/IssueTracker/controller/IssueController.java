@@ -31,45 +31,38 @@ public class IssueController {
     //get all issues
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping()
-    public List<Issue> getAllIssues(){
-        return issueService.findAll();
+    public ResponseEntity<List<Issue>> getAllIssues(){
+        return ResponseEntity.ok(issueService.findAll());
     }
 
     //get issue by id
-    @GetMapping("/issues/{id}")
-    public Issue getIssueById(@PathVariable Long id){
-        Issue issue = issueService.findById(id);
-        if(issue == null){
-            throw new RuntimeException("Issue not found " + id);
-        }
-        return issue;
+    @GetMapping("/{id}")
+    public ResponseEntity<Issue> getIssueById(@PathVariable Long id){
+        return ResponseEntity.ok(issueService.findById(id));
     }
 
-    @PostMapping("/issue")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Issue addIssue(@RequestBody Issue theIssue){
-        //incase they pss some id in json, set that id to 0
+    public ResponseEntity<Issue> addIssue(@RequestBody Issue theIssue){
+        //incase they pass some id in json, set that id to 0
         //this is to force save of the new item instead of an update
         theIssue.setId(0);
-        Issue dbIssue = issueService.save(theIssue);
-        return dbIssue;
+        Issue savedIssue = issueService.save(theIssue);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedIssue);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/issue")
-    public Issue updateIssue(@RequestBody Issue issue){
-        Issue dbIssue = issueService.save(issue);
-        return dbIssue;
+    public ResponseEntity<Issue> updateIssue(@RequestBody Issue issue){
+        return ResponseEntity.ok(issueService.save(issue));
     }
 
     //patch mapping... used for partial update
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/issue/{id}")
-    public Issue patchIssue(@PathVariable long id, @RequestBody Map<String, Object>patchPayLoad ){
+    public ResponseEntity<Issue> patchIssue(@PathVariable long id, @RequestBody Map<String, Object>patchPayLoad ){
         Issue tempIssue = issueService.findById(id);
-        if(tempIssue==null){
-            throw new RuntimeException("Issue not found "+ id);
-        }
+
         //throw exception if request body contains "id" key
         if(patchPayLoad.containsKey("id")){
             throw new RuntimeException("Issue id is not allowed in request body");
@@ -78,7 +71,7 @@ public class IssueController {
         Issue patchedIssue = apply(patchPayLoad, tempIssue);
         Issue dbIssue = issueService.save(patchedIssue);
 
-        return dbIssue;
+        return ResponseEntity.ok(dbIssue);
 
     }
 
@@ -95,15 +88,11 @@ public class IssueController {
 
     }
 
-    @DeleteMapping("/issue/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String deleteIssue(@PathVariable long id){
-        Issue tempIssue = issueService.findById(id);
-        if(tempIssue == null){
-            throw new RuntimeException("Issue id not found: " + id);
-        }
+    public ResponseEntity<Void> deleteIssue(@PathVariable long id){
         issueService.deleteById(id);
-        return "Deleted issue: " + id;
+        return ResponseEntity.noContent().build();
     }
 
 

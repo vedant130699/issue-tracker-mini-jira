@@ -1,4 +1,4 @@
-package IssueTracker.repositorry;
+package IssueTracker.repository;
 
 import IssueTracker.model.Issue;
 import org.springframework.data.jpa.repository.JpaRepository;

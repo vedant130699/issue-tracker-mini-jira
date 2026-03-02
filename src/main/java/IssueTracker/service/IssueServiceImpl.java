@@ -1,7 +1,8 @@
 package IssueTracker.service;
 
+import IssueTracker.exception.ResourceNotFoundException;
 import IssueTracker.model.Issue;
-import IssueTracker.repositorry.IssueRepository;
+import IssueTracker.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +28,8 @@ public class IssueServiceImpl implements IssueService{
 
     @Override
     public Issue findById(Long id) {
-        Optional<Issue> result = issueRepository.findById(id);
-
-        // let controller handle this case
-        return result.orElse(null);
+        return issueRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Issue not found " + id));
     }
 
     @Override
@@ -40,6 +39,8 @@ public class IssueServiceImpl implements IssueService{
 
     @Override
     public void deleteById(Long id) {
-        issueRepository.deleteById(id);
+        Issue issue  = issueRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Issue not found " + id));
+        issueRepository.delete(issue);
     }
 }
