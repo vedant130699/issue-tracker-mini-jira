@@ -2,6 +2,7 @@ package IssueTracker.service;
 
 import IssueTracker.exception.ResourceNotFoundException;
 import IssueTracker.model.Issue;
+import IssueTracker.model.IssueStatus;
 import IssueTracker.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public class IssueServiceImpl implements IssueService{
 
 
-    private IssueRepository issueRepository;
+    private final IssueRepository issueRepository;
 
     @Autowired
     public IssueServiceImpl(IssueRepository theIssueRepository){
@@ -43,4 +44,9 @@ public class IssueServiceImpl implements IssueService{
                 .orElseThrow(()->new ResourceNotFoundException("Issue not found " + id));
         issueRepository.delete(issue);
     }
+    @Override
+    public List<Issue> findByStatus(IssueStatus status){
+        return issueRepository.findByStatus(status);
+    }
+
 }
