@@ -1,5 +1,6 @@
 package IssueTracker.controller;
 
+import IssueTracker.exception.ResourceNotFoundException;
 import IssueTracker.model.Issue;
 import IssueTracker.model.IssueStatus;
 import IssueTracker.service.IssueService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import javax.print.attribute.standard.JobKOctets;
 import java.util.List;
@@ -93,6 +95,21 @@ public class IssueController {
     public ResponseEntity<Void> deleteIssue(@PathVariable long id){
         issueService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/issue/status/{status}")
+    public ResponseEntity<List<Issue>> findByStatus(@PathVariable String status){
+        IssueStatus issueStatus = null;
+        try {
+            issueStatus = IssueStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<Issue> issue = issueService.findByStatus(issueStatus);
+        if(issue.isEmpty()){
+            throw new ResourceNotFoundException("No issues with the status: " + status);
+        }
+        return ResponseEntity.ok(issue);
     }
 
 
