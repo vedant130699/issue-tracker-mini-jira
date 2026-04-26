@@ -9,26 +9,33 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter){
+        this.jwtFilter = jwtFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         //disables csrf for restApis(It is recommended for form data)
         http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**")  // Allow H2 access
-                        .disable()
+                .csrf(csrf -> csrf.disable()
                 )
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())  // Fix H2 console frame issue
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/public/**").permitAll()
+                        .requestMatchers("/h2-console/**", "/public/**", "/auth/login").permitAll()
+
                         .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults()); // Or use formLogin()
+                );
+                 // Or use formLogin()
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
