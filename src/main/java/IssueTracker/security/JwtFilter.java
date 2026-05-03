@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,26 +35,39 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if(authHeader !=null && authHeader.startsWith("Bearer ")){
+        if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            //hardcoded for testing
-            try{
-                if(jwtUtil.isTokenValid(token)){
+
+            try {
+                if(jwtUtil.isTokenValid(token)) {
+
                     String username = jwtUtil.extractUsername(token);
                     String role = jwtUtil.extractRole(token);
+
                     List<SimpleGrantedAuthority> authorities =
                             List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+                    UserDetails userDetails = User
+                            .withUsername(username)
+                            .password("") // not needed
+                            .authorities(authorities)
+                            .build();
+
                     UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
                     System.out.println("Username: " + username);
                     System.out.println("Role: " + role);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Token invalid: " + e.getMessage());
             }
-
-
         }
         filterChain.doFilter(request, response);
     }
