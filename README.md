@@ -159,6 +159,8 @@ IN_PROGRESS
 
 # Security
 
+Currently role is stored in JWT for simplicity; in production, it should be validated from DB.
+
 This project uses **Spring Security with role-based authorization**.
 
 | Role  | Access                        |
