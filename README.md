@@ -135,6 +135,15 @@ GET /api/issues/status/OPEN
 Returns all issues with the specified status.
 
 ---
+## API Endpoints
+
+### Auth
+POST /auth/register
+POST /auth/login
+
+### Issues
+GET /api/issues
+POST /api/issues (ADMIN only)
 
 # Issue Status Enum
 
