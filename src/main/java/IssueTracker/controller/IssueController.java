@@ -60,7 +60,7 @@ public class IssueController {
     }
 
     //patch mapping... used for partial update
-    @PreAuthorize("hasRole('ADMIN')")
+   @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/issue/{id}")
     public ResponseEntity<Issue> patchIssue(@PathVariable long id, @RequestBody Map<String, Object>patchPayLoad ){
         Issue tempIssue = issueService.findById(id);
