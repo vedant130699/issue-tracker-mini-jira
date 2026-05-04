@@ -59,6 +59,12 @@ public class IssueController {
         return ResponseEntity.ok(issueService.save(issue));
     }
 
+    //to update the issue
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/issue/{id}") ResponseEntity<Issue> updateById(@PathVariable Long id, @RequestBody Issue issue){
+        return ResponseEntity.ok(issueService.updateById(id, issue));
+    }
+
     //patch mapping... used for partial update
    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/issue/{id}")

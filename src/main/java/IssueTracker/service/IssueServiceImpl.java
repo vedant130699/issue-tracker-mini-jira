@@ -5,6 +5,7 @@ import IssueTracker.model.Issue;
 import IssueTracker.model.IssueStatus;
 import IssueTracker.repository.IssueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,11 +40,28 @@ public class IssueServiceImpl implements IssueService{
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(Long id) {
         Issue issue  = issueRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Issue not found " + id));
         issueRepository.delete(issue);
     }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public Issue updateById(Long id, Issue updatedIssue) {
+        return issueRepository.findById(id).map(
+                issue -> {
+                    issue.setTitle(updatedIssue.getTitle());
+                    issue.setDescription(updatedIssue.getDescription());
+                    issue.setReporter(updatedIssue.getReporter());
+                    issue.setStatus(updatedIssue.getStatus());
+                    return issueRepository.save(issue);
+                }
+        )
+                .orElseThrow(()-> new ResourceNotFoundException("Id not found" + id));
+    }
+
     @Override
     public List<Issue> findByStatus(IssueStatus status){
         return issueRepository.findByStatus(status);

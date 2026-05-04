@@ -2,9 +2,11 @@ package IssueTracker.controller;
 
 import IssueTracker.dto.AuthRequest;
 import IssueTracker.model.AppUser;
+import IssueTracker.model.Role;
 import IssueTracker.repository.UserRepository;
 import IssueTracker.security.JwtUtil;
 import org.apache.catalina.User;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,11 +29,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody AppUser user){
+    public ResponseEntity<?> register(@RequestBody AppUser user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        if(user.getRole() == null){
+            user.setRole(Role.USER);
+        }
+        AppUser savedUser =  userRepository.save(user);
 
-        return "User Registered";
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered Successfully");
     }
 
 

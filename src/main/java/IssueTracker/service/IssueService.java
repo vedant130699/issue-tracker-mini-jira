@@ -11,6 +11,7 @@ public interface IssueService {
     Issue findById(Long id);
     Issue save(Issue issue);
     void deleteById(Long id);
+    Issue updateById(Long id, Issue updatedIssue);
 
     List<Issue> findByStatus(IssueStatus status);
 }

@@ -1,7 +1,7 @@
 package IssueTracker.security;
 
+import IssueTracker.model.Role;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ public class JwtUtil {
     private final String SECRET= "mysecretmysecretmysecretmysecretmysecretmysecretmysecretmysecret";
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    public String generateToken(String username, String role){
+    public String generateToken(String username, Role role){
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
